@@ -6,6 +6,7 @@ let ctx = null;
 let master = null;
 let masterGain = null;
 let ambienceGain = null;
+let volume = 0.1;
 
 export function getContext() {
   if (!ctx) {
@@ -41,7 +42,7 @@ function buildMaster() {
   comp.release.value = 0.25;
 
   masterGain = c.createGain();
-  masterGain.gain.value = 0.1;
+  masterGain.gain.value = volume;
 
   master.connect(wow.input);
   wow.output.connect(tone);
@@ -66,7 +67,9 @@ export function getMaster() {
 }
 
 export function setVolume(value) {
-  if (!masterGain) getMaster();
+  volume = value;
+
+  if (!masterGain) return;
 
   masterGain.gain.setTargetAtTime(value, getContext().currentTime, 0.01);
 }

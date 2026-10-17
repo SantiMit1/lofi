@@ -12,6 +12,7 @@ const historyList = document.querySelector("#historyList");
 
 const HISTORY_MAX = 5;
 const HISTORY_KEY = "lofi-history";
+const VOLUME_KEY = "lofi-volume";
 const DEFAULT_SWING = 0.2;
 
 let history = loadHistory();
@@ -189,6 +190,7 @@ tempoInput.addEventListener("change", () => {
 
 volumeInput.addEventListener("input", () => {
   setVolume(Number(volumeInput.value));
+  localStorage.setItem(VOLUME_KEY, volumeInput.value);
 });
 
 swingInput.addEventListener("input", () => {
@@ -213,14 +215,17 @@ const seedParam = params.get("seed");
 const tempoParam = Number(params.get("tempo"));
 const swingRaw = params.get("swing");
 const swingParam = Number(swingRaw);
+const savedVolume = localStorage.getItem(VOLUME_KEY);
 
 seedInput.value = seedParam?.trim() || randomSeed();
 if (tempoParam > 0 && tempoParam <= 200) tempoInput.value = tempoParam;
 if (swingRaw && swingParam >= 0 && swingParam <= 1) swingInput.value = swingParam;
+if (savedVolume && Number(savedVolume) >= 0 && Number(savedVolume) <= 1) volumeInput.value = savedVolume;
 
 applySeed(seedInput.value);
 setTempo(Number(tempoInput.value));
 setSwing(Number(swingInput.value));
+setVolume(Number(volumeInput.value));
 renderHistory();
 
 
