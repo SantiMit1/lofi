@@ -2,7 +2,7 @@ import { getContext } from "../engine.js";
 import { getTrack } from "../mixer.js";
 import { midiToFreq } from "../../theory/notes.js";
 
-export function playKeys(midi, time, duration, velocity = 0.5) {
+export function playKeys(midi, time, duration, velocity = 0.5, track = "keys") {
   const ctx = getContext();
   const freq = midiToFreq(midi);
 
@@ -20,7 +20,7 @@ export function playKeys(midi, time, duration, velocity = 0.5) {
   modGain.connect(carrier.frequency);
 
   carrier.connect(amp);
-  amp.connect(getTrack("keys").input);
+  amp.connect(getTrack(track).input);
 
   const attack = 0.008;
   amp.gain.setValueAtTime(0.0001, time);

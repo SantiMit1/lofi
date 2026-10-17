@@ -1,6 +1,7 @@
 import { MarkovChain } from "../markov/MarkovChain.js";
 import { CHORD_TRANSITIONS, DRUM_TRANSITIONS } from "../markov/tables.js";
 import { DRUM_PATTERNS } from "./patterns.js";
+import { createMelody } from "./melody.js";
 import { chordNotes, voiceOpen } from "../theory/scales.js";
 import { createRng } from "../core/rng.js";
 
@@ -10,6 +11,7 @@ export function createComposer(seed = 1) {
   const rng = createRng(seed);
   const chords = new MarkovChain(CHORD_TRANSITIONS);
   const drumPatterns = new MarkovChain(DRUM_TRANSITIONS);
+  const melody = createMelody();
   let currentChord = "I";
   let currentPattern = "boomBap";
 
@@ -38,6 +40,8 @@ export function createComposer(seed = 1) {
         if (vel > 0) events.push({ instrument: "drum", voice, at: step / 4, vel });
       });
     }
+
+    events.push(...melody.phrase(currentChord, rng));
 
     return { degree: currentChord, pattern: currentPattern, events };
   }

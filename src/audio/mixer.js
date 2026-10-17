@@ -4,6 +4,7 @@ import { createReverb } from "./effects/reverb.js";
 // Nivel, paneo y envío a reverb por pista.
 const CONFIG = {
   keys: { level: 0.9, pan: -0.15, reverb: 0.35 },
+  lead: { level: 0.7, pan: 0.2, reverb: 0.5 },
   bass: { level: 1.0, pan: 0.0, reverb: 0.05 },
   drums: { level: 0.9, pan: 0.0, reverb: 0.15 },
 };

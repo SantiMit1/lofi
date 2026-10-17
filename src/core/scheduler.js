@@ -36,7 +36,9 @@ function playEvent(event, time) {
   const beat = 60 / tempo;
 
   if (event.instrument === "keys") {
-    playKeys(event.midi, time, event.length * beat, event.vel);
+    playKeys(event.midi, time, event.length * beat, event.vel, "keys");
+  } else if (event.instrument === "lead") {
+    playKeys(event.midi, time, event.length * beat, event.vel, "lead");
   } else if (event.instrument === "bass") {
     playBass(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "drum") {
