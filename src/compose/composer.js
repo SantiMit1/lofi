@@ -4,6 +4,7 @@ import { DRUM_PATTERNS } from "./patterns.js";
 import { createMelody } from "./melody.js";
 import { chordNotes, voiceOpen } from "../theory/scales.js";
 import { createRng } from "../core/rng.js";
+import { sectionPlan, SECTION_RULES } from "./sections.js";
 
 const KEY_ROOT = 60; // C4
 
@@ -39,12 +40,18 @@ export function createComposer(seed = 1) {
   });
   const drumPatterns = new MarkovChain(DRUM_TRANSITIONS);
   const melody = createMelody();
+  const plan = sectionPlan();
+  let barIndex = 0;
   let currentChord = "I";
   let previousChord = "I";
   let currentPattern = "boomBap";
 
   // Decide un compás completo. Devuelve eventos con offsets en beats.
   function nextBar() {
+    const section = plan[barIndex];
+    const rules = SECTION_RULES[section];
+    barIndex++;
+
     const key = `${previousChord}|${currentChord}`;
     previousChord = currentChord;
     currentChord = chords.sample(key, rng);
@@ -68,15 +75,21 @@ export function createComposer(seed = 1) {
     events.push({ instrument: "bass", midi: bassSecond - 24, at: 2, length: 1.6, vel: 0.5 });
 
     for (const [voice, steps] of Object.entries(DRUM_PATTERNS[currentPattern])) {
+      if (!rules.drums.includes(voice)) continue;
+
       steps.forEach((vel, step) => {
         if (vel > 0) events.push({ instrument: "drum", voice, at: step / 4, vel });
       });
     }
 
-    events.push(...melody.phrase(currentChord, rng));
+    if (rules.openHat) {
+      events.push({ instrument: "drum", voice: "openHat", at: 3.25, vel: 0.25 });
+    }
+
+    events.push(...melody.phrase(currentChord, rng, rules.density));
     humanize(events, rng);
 
-    return { degree: currentChord, pattern: currentPattern, events };
+    return { degree: currentChord, pattern: currentPattern, section, events, last: barIndex === plan.length };
   }
 
   return { nextBar };

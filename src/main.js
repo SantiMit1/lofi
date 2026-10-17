@@ -1,5 +1,5 @@
 import { unlock, setVolume } from "./audio/engine.js";
-import { start, stop, restart, setTempo, setSeed, setSwing, isPlaying } from "./core/scheduler.js";
+import { start, stop, restart, setTempo, setSeed, setSwing, setOnSongEnd, isPlaying } from "./core/scheduler.js";
 
 const toggleButton = document.querySelector("#toggleButton");
 const tempoInput = document.querySelector("#tempo");
@@ -8,9 +8,73 @@ const swingInput = document.querySelector("#swing");
 const seedInput = document.querySelector("#seed");
 const randomSeedButton = document.querySelector("#randomSeed");
 const themeToggle = document.querySelector("#themeToggle");
+const historyList = document.querySelector("#historyList");
+
+const HISTORY_MAX = 12;
+const history = [];
 
 function randomSeed() {
   return String(Math.floor(Math.random() * 1000000));
+}
+
+function randomTempo() {
+  return 70 + Math.floor(Math.random() * 26);
+}
+
+function currentSeed() {
+  return seedInput.value.trim();
+}
+
+function currentTempo() {
+  return Number(tempoInput.value);
+}
+
+function renderHistory() {
+  historyList.replaceChildren();
+
+  history.forEach((entry, index) => {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "history__item";
+    if (index === 0 && isPlaying()) button.classList.add("is-current");
+    button.textContent = `${entry.seed} · ${entry.tempo} bpm`;
+    button.addEventListener("click", () => play(entry.seed, entry.tempo));
+
+    item.append(button);
+    historyList.append(item);
+  });
+}
+
+function setPlayingUI(playing) {
+  toggleButton.textContent = playing ? "Stop" : "Start";
+  toggleButton.classList.toggle("is-playing", playing);
+  renderHistory();
+}
+
+function record(seed, tempo) {
+  const index = history.findIndex((entry) => entry.seed === seed && entry.tempo === tempo);
+  if (index !== -1) history.splice(index, 1);
+
+  history.unshift({ seed, tempo });
+  if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
+}
+
+function play(seed, tempo) {
+  seedInput.value = seed;
+  tempoInput.value = tempo;
+  setSeed(seed);
+  setTempo(tempo);
+
+  if (isPlaying()) {
+    restart();
+  } else {
+    start();
+  }
+
+  record(seed, tempo);
+  setPlayingUI(true);
 }
 
 function applySeed(value) {
@@ -26,12 +90,9 @@ toggleButton.addEventListener("click", async () => {
 
   if (isPlaying()) {
     stop();
-    toggleButton.textContent = "Start";
-    toggleButton.classList.remove("is-playing");
+    setPlayingUI(false);
   } else {
-    start();
-    toggleButton.textContent = "Stop";
-    toggleButton.classList.add("is-playing");
+    play(currentSeed(), currentTempo());
   }
 });
 
@@ -41,8 +102,8 @@ tempoInput.addEventListener("change", () => {
   if (bpm > 0 && bpm <= 200) {
     setTempo(bpm);
   } else {
-    setTempo(90);
     tempoInput.value = 90;
+    setTempo(90);
   }
 
   restart();
@@ -59,12 +120,16 @@ swingInput.addEventListener("input", () => {
 seedInput.addEventListener("change", () => applySeed(seedInput.value));
 
 randomSeedButton.addEventListener("click", () => {
-  seedInput.value = randomSeed();
-  applySeed(seedInput.value);
+  const seed = randomSeed();
+  seedInput.value = seed;
+  applySeed(seed);
 });
+
+setOnSongEnd(() => play(randomSeed(), randomTempo()));
 
 seedInput.value = randomSeed();
 applySeed(seedInput.value);
+renderHistory();
 
 
 //TEMA

@@ -7,12 +7,15 @@ import { createComposer } from "../compose/composer.js";
 
 let tempo = 90;
 let swing = 0.2;
+let seed = 1;
 let nextNoteTime = 0;
 let current16th = 0;
 let timerID = null;
 let isRunning = false;
+let songEndAt = null;
+let onSongEnd = null;
 
-let composer = createComposer(1);
+let composer = createComposer(seed);
 
 // Eventos del compás ya generado, esperando entrar en la ventana de lookahead.
 let barQueue = [];
@@ -20,6 +23,7 @@ let queueIndex = 0;
 
 const LOOKAHEAD_MS = 25;
 const SCHEDULE_AHEAD = 0.1;
+const SONG_GAP = 2;
 
 const DRUM_VOICES = {
   kick: playKick,
@@ -57,12 +61,15 @@ function playEvent(event, time) {
 // Genera el compás completo en la frontera, pero solo lo deja en la cola.
 function generateBar(barStart) {
   const beat = 60 / tempo;
-  const { events } = composer.nextBar();
+  const bar = composer.nextBar();
 
-  barQueue = events
+  barQueue = bar.events
     .map((event) => ({ ...event, time: barStart + event.at * beat + swingDelay(event.at, beat) }))
     .sort((a, b) => a.time - b.time);
   queueIndex = 0;
+
+  // El compás final marca cuando termina la canción (arranque del siguiente).
+  if (bar.last) songEndAt = barStart + 4 * beat;
 }
 
 // Manda al audio solo lo que cae dentro de la ventana (<= SCHEDULE_AHEAD).
@@ -74,13 +81,25 @@ function flushQueue(until) {
 }
 
 function scheduler() {
-  const ctx = getContext();
-  const until = ctx.currentTime + SCHEDULE_AHEAD;
+  const now = getContext().currentTime;
+
+  // Canción terminada: esperar a que se despache el último compás y, tras la
+  // pausa, avisar. El vinilo sigue sonando (no se toca la ambience).
+  if (songEndAt !== null && now >= songEndAt - SCHEDULE_AHEAD) {
+    if (now >= songEndAt + SONG_GAP) {
+      const callback = onSongEnd;
+      halt();
+      if (callback) callback();
+    }
+    return;
+  }
+
+  const until = now + SCHEDULE_AHEAD;
 
   while (nextNoteTime < until) {
     flushQueue(until);
 
-    if (current16th === 0) {
+    if (current16th === 0 && songEndAt === null) {
       generateBar(nextNoteTime);
       flushQueue(until);
     }
@@ -89,12 +108,24 @@ function scheduler() {
   }
 }
 
-function run() {
-  current16th = 0;
+function resetQueue() {
   barQueue = [];
   queueIndex = 0;
+  songEndAt = null;
+}
+
+function run() {
+  current16th = 0;
+  resetQueue();
   nextNoteTime = getContext().currentTime + 0.05;
   timerID = setInterval(scheduler, LOOKAHEAD_MS);
+}
+
+function halt() {
+  clearInterval(timerID);
+  timerID = null;
+  isRunning = false;
+  resetQueue();
 }
 
 export function start() {
@@ -110,15 +141,12 @@ export function restart() {
   if (!isRunning) return;
 
   clearInterval(timerID);
+  composer = createComposer(seed);
   run();
 }
 
 export function stop() {
-  clearInterval(timerID);
-  timerID = null;
-  isRunning = false;
-  barQueue = [];
-  queueIndex = 0;
+  halt();
   setAmbience(false);
 }
 
@@ -130,8 +158,13 @@ export function setSwing(value) {
   swing = value;
 }
 
-export function setSeed(seed) {
+export function setSeed(value) {
+  seed = value;
   composer = createComposer(seed);
+}
+
+export function setOnSongEnd(callback) {
+  onSongEnd = callback;
 }
 
 export function isPlaying() {

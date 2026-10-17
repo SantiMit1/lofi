@@ -35,8 +35,9 @@ export function createMelody() {
   let duration = "1";
 
   // Frase de un compás sobre el acorde dado. Devuelve eventos con offsets en beats.
-  function phrase(roman, rng) {
+  function phrase(roman, rng, density = 1) {
     const tones = chordTones(roman);
+    const restChance = Math.min(0.8, REST_CHANCE / density);
     const events = [];
     let pos = 0;
 
@@ -47,7 +48,7 @@ export function createMelody() {
       const len = Number(duration);
       if (pos + len > 4) break;
 
-      if (rng.next() >= REST_CHANCE) {
+      if (rng.next() >= restChance) {
         const picked = notes.sample(degree, rng);
         // En notas largas (tiempos fuertes) resolvemos a un tono del acorde.
         degree = len >= 1 ? nearestChordTone(picked, tones) : picked;
