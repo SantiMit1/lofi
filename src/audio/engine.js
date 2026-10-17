@@ -5,6 +5,7 @@ import { createTapeNoise } from "./effects/tapeNoise.js";
 let ctx = null;
 let master = null;
 let masterGain = null;
+let ambienceGain = null;
 
 export function getContext() {
   if (!ctx) {
@@ -49,7 +50,11 @@ function buildMaster() {
   comp.connect(masterGain);
   masterGain.connect(c.destination);
 
-  createTapeNoise(c).output.connect(master);
+  const noise = createTapeNoise(c);
+  ambienceGain = c.createGain();
+  ambienceGain.gain.value = 0;
+  noise.output.connect(ambienceGain);
+  ambienceGain.connect(master);
 
   return master;
 }
@@ -64,6 +69,13 @@ export function setVolume(value) {
   if (!masterGain) getMaster();
 
   masterGain.gain.setTargetAtTime(value, getContext().currentTime, 0.01);
+}
+
+export function setAmbience(active) {
+  if (!ambienceGain) return;
+
+  const target = active ? 1 : 0;
+  ambienceGain.gain.setTargetAtTime(target, getContext().currentTime, 0.1);
 }
 
 export async function unlock() {
