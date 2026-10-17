@@ -1,9 +1,10 @@
 import { unlock, setVolume } from "./audio/engine.js";
-import { start, stop, restart, setTempo, setSeed, isPlaying } from "./core/scheduler.js";
+import { start, stop, restart, setTempo, setSeed, setSwing, isPlaying } from "./core/scheduler.js";
 
 const toggleButton = document.querySelector("#toggleButton");
 const tempoInput = document.querySelector("#tempo");
 const volumeInput = document.querySelector("#volume");
+const swingInput = document.querySelector("#swing");
 const seedInput = document.querySelector("#seed");
 const randomSeedButton = document.querySelector("#randomSeed");
 const themeToggle = document.querySelector("#themeToggle");
@@ -49,6 +50,10 @@ tempoInput.addEventListener("change", () => {
 
 volumeInput.addEventListener("input", () => {
   setVolume(Number(volumeInput.value));
+});
+
+swingInput.addEventListener("input", () => {
+  setSwing(Number(swingInput.value));
 });
 
 seedInput.addEventListener("change", () => applySeed(seedInput.value));

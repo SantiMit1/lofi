@@ -6,6 +6,7 @@ import { initMixer } from "../audio/mixer.js";
 import { createComposer } from "../compose/composer.js";
 
 let tempo = 90;
+let swing = 0.2;
 let nextNoteTime = 0;
 let current16th = 0;
 let timerID = null;
@@ -32,6 +33,13 @@ function advance() {
   current16th = (current16th + 1) % 16;
 }
 
+// Retrasa las semicorcheas impares. La grilla del reloj queda recta: el swing
+// solo mueve notas dentro del compás, nunca el inicio del compás.
+function swingDelay(atBeats, beat) {
+  const step = Math.round(atBeats * 4);
+  return step % 2 === 1 ? swing * 0.125 * beat : 0;
+}
+
 function playEvent(event, time) {
   const beat = 60 / tempo;
 
@@ -52,7 +60,7 @@ function generateBar(barStart) {
   const { events } = composer.nextBar();
 
   barQueue = events
-    .map((event) => ({ ...event, time: barStart + event.at * beat }))
+    .map((event) => ({ ...event, time: barStart + event.at * beat + swingDelay(event.at, beat) }))
     .sort((a, b) => a.time - b.time);
   queueIndex = 0;
 }
@@ -116,6 +124,10 @@ export function stop() {
 
 export function setTempo(bpm) {
   tempo = bpm;
+}
+
+export function setSwing(value) {
+  swing = value;
 }
 
 export function setSeed(seed) {
