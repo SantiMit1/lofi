@@ -2,6 +2,7 @@ import { getContext } from "../audio/engine.js";
 import { playKeys } from "../audio/instruments/keys.js";
 import { playBass } from "../audio/instruments/bass.js";
 import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
+import { initMixer } from "../audio/mixer.js";
 import { createComposer } from "../compose/composer.js";
 
 let tempo = 90;
@@ -60,6 +61,7 @@ function scheduler() {
 export function start() {
   if (isRunning) return;
 
+  initMixer();
   isRunning = true;
   current16th = 0;
   nextNoteTime = getContext().currentTime + 0.05;

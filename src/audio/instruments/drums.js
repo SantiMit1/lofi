@@ -1,4 +1,5 @@
-import { getContext, getMaster } from "../engine.js";
+import { getContext } from "../engine.js";
+import { getTrack } from "../mixer.js";
 import { getNoiseBuffer } from "../noise.js";
 
 export function playKick(time, velocity = 1) {
@@ -14,7 +15,7 @@ export function playKick(time, velocity = 1) {
   amp.gain.exponentialRampToValueAtTime(0.0001, time + 0.35);
 
   osc.connect(amp);
-  amp.connect(getMaster());
+  amp.connect(getTrack("drums").input);
 
   osc.start(time);
   osc.stop(time + 0.4);
@@ -34,7 +35,7 @@ export function playSnare(time, velocity = 1) {
 
   noise.connect(hp);
   hp.connect(noiseAmp);
-  noiseAmp.connect(getMaster());
+  noiseAmp.connect(getTrack("drums").input);
   noise.start(time);
   noise.stop(time + 0.2);
 
@@ -47,7 +48,7 @@ export function playSnare(time, velocity = 1) {
   oscAmp.gain.exponentialRampToValueAtTime(0.0001, time + 0.1);
 
   osc.connect(oscAmp);
-  oscAmp.connect(getMaster());
+  oscAmp.connect(getTrack("drums").input);
   osc.start(time);
   osc.stop(time + 0.12);
 }
@@ -67,7 +68,7 @@ export function playHat(time, velocity = 1, open = false) {
 
   noise.connect(hp);
   hp.connect(amp);
-  amp.connect(getMaster());
+  amp.connect(getTrack("drums").input);
 
   noise.start(time);
   noise.stop(time + dur + 0.02);

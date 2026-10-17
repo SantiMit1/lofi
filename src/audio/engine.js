@@ -1,5 +1,10 @@
+import { makeSaturationCurve } from "./effects/saturation.js";
+import { createWowFlutter } from "./effects/wowFlutter.js";
+import { createTapeNoise } from "./effects/tapeNoise.js";
+
 let ctx = null;
 let master = null;
+let masterGain = null;
 
 export function getContext() {
   if (!ctx) {
@@ -9,24 +14,61 @@ export function getContext() {
   return ctx;
 }
 
+// Cadena del bus master:
+// sum -> wow/flutter -> lowpass -> saturacion -> compresor -> gain -> destino
+function buildMaster() {
+  const c = getContext();
+
+  master = c.createGain();
+
+  const wow = createWowFlutter(c);
+
+  const tone = c.createBiquadFilter();
+  tone.type = "lowpass";
+  tone.frequency.value = 7500;
+  tone.Q.value = 0.4;
+
+  const sat = c.createWaveShaper();
+  sat.curve = makeSaturationCurve(1.6);
+  sat.oversample = "2x";
+
+  const comp = c.createDynamicsCompressor();
+  comp.threshold.value = -14;
+  comp.knee.value = 30;
+  comp.ratio.value = 2.5;
+  comp.attack.value = 0.01;
+  comp.release.value = 0.25;
+
+  masterGain = c.createGain();
+  masterGain.gain.value = 0.8;
+
+  master.connect(wow.input);
+  wow.output.connect(tone);
+  tone.connect(sat);
+  sat.connect(comp);
+  comp.connect(masterGain);
+  masterGain.connect(c.destination);
+
+  createTapeNoise(c).output.connect(master);
+
+  return master;
+}
+
 export function getMaster() {
-  if (!master) {
-    master = getContext().createGain();
-    master.gain.value = 0.8;
-    master.connect(getContext().destination);
-  }
+  if (!master) buildMaster();
 
   return master;
 }
 
 export function setVolume(value) {
-  const m = getMaster();
-  m.gain.setTargetAtTime(value, getContext().currentTime, 0.01);
+  if (!masterGain) getMaster();
+
+  masterGain.gain.setTargetAtTime(value, getContext().currentTime, 0.01);
 }
 
 export async function unlock() {
   const c = getContext();
-  if (c.state === 'suspended') {
+  if (c.state === "suspended") {
     await c.resume();
   }
 }

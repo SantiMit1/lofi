@@ -1,4 +1,5 @@
-import { getContext, getMaster } from "../engine.js";
+import { getContext } from "../engine.js";
+import { getTrack } from "../mixer.js";
 import { midiToFreq } from "../../theory/notes.js";
 
 export function playBass(midi, time, duration, velocity = 0.6) {
@@ -21,7 +22,7 @@ export function playBass(midi, time, duration, velocity = 0.6) {
 
   osc.connect(filter);
   filter.connect(amp);
-  amp.connect(getMaster());
+  amp.connect(getTrack("bass").input);
 
   osc.start(time);
   osc.stop(time + duration + 0.05);

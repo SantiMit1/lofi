@@ -1,4 +1,5 @@
-import { getContext, getMaster } from "../engine.js";
+import { getContext } from "../engine.js";
+import { getTrack } from "../mixer.js";
 import { midiToFreq } from "../../theory/notes.js";
 
 export function playKeys(midi, time, duration, velocity = 0.5) {
@@ -19,7 +20,7 @@ export function playKeys(midi, time, duration, velocity = 0.5) {
   modGain.connect(carrier.frequency);
 
   carrier.connect(amp);
-  amp.connect(getMaster());
+  amp.connect(getTrack("keys").input);
 
   const attack = 0.008;
   amp.gain.setValueAtTime(0.0001, time);
