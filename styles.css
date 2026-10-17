@@ -53,6 +53,8 @@ body {
 }
 
 .app {
+  position: relative;
+  z-index: 1;
   margin: auto;
   width: 100%;
   max-width: 420px;
@@ -62,6 +64,22 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Fondo: se dibuja sobre el color de body y por debajo de la tarjeta. */
+.viz {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.viz.is-visible {
+  opacity: 0.45;
 }
 
 .app__header {
@@ -332,6 +350,8 @@ input[type="range"]:focus-visible::-moz-range-thumb {
 }
 
 .footer {
+  position: relative;
+  z-index: 1;
   padding-top: 24px;
   text-align: center;
 }

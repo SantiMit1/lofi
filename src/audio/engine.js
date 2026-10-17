@@ -6,6 +6,7 @@ let ctx = null;
 let master = null;
 let masterGain = null;
 let ambienceGain = null;
+let analyser = null;
 let volume = 0.1;
 
 export function getContext() {
@@ -44,12 +45,19 @@ function buildMaster() {
   masterGain = c.createGain();
   masterGain.gain.value = volume;
 
+  analyser = c.createAnalyser();
+  analyser.fftSize = 2048;
+  analyser.minDecibels = -100;
+  analyser.maxDecibels = -10;
+  analyser.smoothingTimeConstant = 0.8;
+
   master.connect(wow.input);
   wow.output.connect(tone);
   tone.connect(sat);
   sat.connect(comp);
   comp.connect(masterGain);
   masterGain.connect(c.destination);
+  masterGain.connect(analyser);
 
   const noise = createTapeNoise(c);
   ambienceGain = c.createGain();
@@ -64,6 +72,12 @@ export function getMaster() {
   if (!master) buildMaster();
 
   return master;
+}
+
+export function getAnalyser() {
+  if (!analyser) buildMaster();
+
+  return analyser;
 }
 
 export function setVolume(value) {

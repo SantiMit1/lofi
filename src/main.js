@@ -1,5 +1,6 @@
 import { unlock, setVolume } from "./audio/engine.js";
 import { start, stop, restart, setTempo, setSeed, setSwing, setOnSongEnd, isPlaying } from "./core/scheduler.js";
+import { init as initVisualizer, start as startVisualizer, stop as stopVisualizer, refreshTheme } from "./visualizer.js";
 
 const toggleButton = document.querySelector("#toggleButton");
 const tempoInput = document.querySelector("#tempo");
@@ -127,6 +128,8 @@ function renderHistory() {
 function setPlayingUI(playing) {
   toggleButton.textContent = playing ? "Stop" : "Start";
   toggleButton.classList.toggle("is-playing", playing);
+  if (playing) startVisualizer();
+  else stopVisualizer();
   renderHistory();
 }
 
@@ -228,6 +231,9 @@ setSwing(Number(swingInput.value));
 setVolume(Number(volumeInput.value));
 renderHistory();
 
+// El visualizador de fondo queda listo (y en reposo) apenas carga la pagina.
+initVisualizer();
+
 
 //TEMA
 const THEME_KEY = "lofi-theme";
@@ -241,6 +247,7 @@ function applyTheme(theme) {
 
   themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
   localStorage.setItem(THEME_KEY, theme);
+  refreshTheme();
 }
 
 themeToggle.addEventListener("click", () => {

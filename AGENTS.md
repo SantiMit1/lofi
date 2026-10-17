@@ -39,6 +39,10 @@ de orden 2, batería, bajo, melodía, humanización) → `src/audio/*` (síntesi
   sección. Cambiar `FORM` cambia el largo de cada canción. `composer.nextBar()` marca el último compás
   con `last`; el scheduler avisa por `setOnSongEnd()` y `main.js` arranca otra con seed y tempo al azar.
 - `src/audio/instruments/click.js` (metrónomo) no está cableado a nada.
+- `src/visualizer.js`: el visualizador de fondo (barras + onda en un `<canvas>`). `main.js` lo arranca y
+  lo para junto con la reproducción. Toma el audio del `AnalyserNode` que `engine.js` engancha **después
+  de `masterGain`**, así que refleja el volumen; usa datos en bytes (escala dB) para que a volumen bajo
+  siga viéndose. Las constantes de calibración están arriba del módulo.
 
 ## Trampas
 
