@@ -56,7 +56,7 @@ export function setTempo(bpm) {
   tempo = bpm;
 }
 
-export function regenerate(seed) {
+export function setSeed(seed) {
   composer = createComposer(seed);
 }
 
