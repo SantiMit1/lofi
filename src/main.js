@@ -44,20 +44,67 @@ function currentTempo() {
   return Number(tempoInput.value);
 }
 
+function songUrl(seed, tempo) {
+  const params = new URLSearchParams({ seed, tempo });
+  return `${location.origin}${location.pathname}?${params}`;
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    document.body.append(area);
+    area.select();
+
+    const copied = document.execCommand("copy");
+    area.remove();
+    return copied;
+  }
+}
+
+function copySongLink(button, seed, tempo) {
+  copyText(songUrl(seed, tempo)).then((copied) => {
+    if (!copied) return;
+
+    button.textContent = "✓";
+    button.classList.add("is-copied");
+    setTimeout(() => {
+      button.textContent = "🔗";
+      button.classList.remove("is-copied");
+    }, 1200);
+  });
+}
+
 function renderHistory() {
   historyList.replaceChildren();
 
   history.forEach((entry) => {
     const item = document.createElement("li");
-    const button = document.createElement("button");
+    const playButton = document.createElement("button");
+    const copyButton = document.createElement("button");
 
-    button.type = "button";
-    button.className = "history__item";
-    if (entry.seed === currentSeed() && entry.tempo === currentTempo()) button.classList.add("is-current");
-    button.textContent = `${entry.seed} · ${entry.tempo} bpm`;
-    button.addEventListener("click", () => play(entry.seed, entry.tempo));
+    item.className = "history__item";
+    if (entry.seed === currentSeed() && entry.tempo === currentTempo()) item.classList.add("is-current");
 
-    item.append(button);
+    playButton.type = "button";
+    playButton.className = "history__play";
+    playButton.textContent = `${entry.seed} · ${entry.tempo} bpm`;
+    playButton.addEventListener("click", () => play(entry.seed, entry.tempo));
+
+    copyButton.type = "button";
+    copyButton.className = "history__copy";
+    copyButton.textContent = "🔗";
+    copyButton.title = "Copiar link de este tema";
+    copyButton.setAttribute("aria-label", "Copiar link de este tema");
+    copyButton.addEventListener("click", () => copySongLink(copyButton, entry.seed, entry.tempo));
+
+    item.append(playButton, copyButton);
     historyList.append(item);
   });
 }
@@ -145,8 +192,15 @@ setOnSongEnd(() => {
   play(randomSeed(), randomTempo());
 });
 
-seedInput.value = randomSeed();
+const params = new URLSearchParams(location.search);
+const seedParam = params.get("seed");
+const tempoParam = Number(params.get("tempo"));
+
+seedInput.value = seedParam?.trim() || randomSeed();
+if (tempoParam > 0 && tempoParam <= 200) tempoInput.value = tempoParam;
+
 applySeed(seedInput.value);
+setTempo(Number(tempoInput.value));
 renderHistory();
 
 
