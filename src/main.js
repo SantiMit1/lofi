@@ -22,9 +22,11 @@ toggleButton.addEventListener("click", async () => {
   if (isPlaying()) {
     stop();
     toggleButton.textContent = "Start";
+    toggleButton.classList.remove("is-playing");
   } else {
     start();
     toggleButton.textContent = "Stop";
+    toggleButton.classList.add("is-playing");
   }
 });
 

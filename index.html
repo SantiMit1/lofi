@@ -1,21 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LoFi Gen</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="controls">
-    <button id="toggleButton">Start</button>
-    <label for="tempo">Tempo</label>
-    <input id="tempo" type="number" min="40" max="200" value="90" />
-    <label for="volume">Vol</label>
-    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.1" />
-    <label for="seed">Seed</label>
-    <input id="seed" type="text" size="10" />
-    <button id="randomSeed" title="Randomizar seed">🎲</button>
-  </div>
+  <main class="app">
+    <header class="app__header">
+      <h1 class="app__title">LoFi Gen</h1>
+      <p class="app__subtitle">lo-fi generator with Markov chains</p>
+    </header>
+
+    <div class="controls">
+      <button id="toggleButton" class="button button--primary">Start</button>
+
+      <div class="controls__row">
+        <div class="field">
+          <label class="field__label" for="tempo">Tempo</label>
+          <input id="tempo" type="number" min="40" max="200" value="90" />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="volume">Volume</label>
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="0.1" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="seed">Seed</label>
+        <div class="field__row">
+          <input id="seed" type="text" />
+          <button id="randomSeed" class="button button--icon" title="Randomizar seed" aria-label="Randomizar seed">🎲</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <script type="module" src="src/main.js"></script>
 </body>
 </html>
