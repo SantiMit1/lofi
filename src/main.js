@@ -12,13 +12,23 @@ const historyList = document.querySelector("#historyList");
 
 const HISTORY_MAX = 5;
 const HISTORY_KEY = "lofi-history";
+const DEFAULT_SWING = 0.2;
 
 let history = loadHistory();
 
 function loadHistory() {
   try {
     const saved = JSON.parse(localStorage.getItem(HISTORY_KEY));
-    return Array.isArray(saved) ? saved.slice(0, HISTORY_MAX) : [];
+    if (!Array.isArray(saved)) return [];
+
+    return saved
+      .filter((entry) => entry && typeof entry.seed === "string" && Number.isFinite(entry.tempo))
+      .slice(0, HISTORY_MAX)
+      .map((entry) => ({
+        seed: entry.seed,
+        tempo: entry.tempo,
+        swing: Number.isFinite(entry.swing) ? entry.swing : DEFAULT_SWING,
+      }));
   } catch {
     return [];
   }
@@ -44,8 +54,12 @@ function currentTempo() {
   return Number(tempoInput.value);
 }
 
-function songUrl(seed, tempo) {
-  const params = new URLSearchParams({ seed, tempo });
+function currentSwing() {
+  return Number(swingInput.value);
+}
+
+function songUrl(seed, tempo, swing) {
+  const params = new URLSearchParams({ seed, tempo, swing });
   return `${location.origin}${location.pathname}?${params}`;
 }
 
@@ -68,8 +82,8 @@ async function copyText(text) {
   }
 }
 
-function copySongLink(button, seed, tempo) {
-  copyText(songUrl(seed, tempo)).then((copied) => {
+function copySongLink(button, seed, tempo, swing) {
+  copyText(songUrl(seed, tempo, swing)).then((copied) => {
     if (!copied) return;
 
     button.textContent = "✓";
@@ -95,14 +109,14 @@ function renderHistory() {
     playButton.type = "button";
     playButton.className = "history__play";
     playButton.textContent = `${entry.seed} · ${entry.tempo} bpm`;
-    playButton.addEventListener("click", () => play(entry.seed, entry.tempo));
+    playButton.addEventListener("click", () => play(entry.seed, entry.tempo, entry.swing));
 
     copyButton.type = "button";
     copyButton.className = "history__copy";
     copyButton.textContent = "🔗";
     copyButton.title = "Copiar link de este tema";
     copyButton.setAttribute("aria-label", "Copiar link de este tema");
-    copyButton.addEventListener("click", () => copySongLink(copyButton, entry.seed, entry.tempo));
+    copyButton.addEventListener("click", () => copySongLink(copyButton, entry.seed, entry.tempo, entry.swing));
 
     item.append(playButton, copyButton);
     historyList.append(item);
@@ -115,20 +129,22 @@ function setPlayingUI(playing) {
   renderHistory();
 }
 
-function record(seed, tempo) {
+function record(seed, tempo, swing) {
   const index = history.findIndex((entry) => entry.seed === seed && entry.tempo === tempo);
   if (index !== -1) history.splice(index, 1);
 
-  history.unshift({ seed, tempo });
+  history.unshift({ seed, tempo, swing });
   if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
   saveHistory();
 }
 
-function play(seed, tempo) {
+function play(seed, tempo, swing) {
   seedInput.value = seed;
   tempoInput.value = tempo;
+  swingInput.value = swing;
   setSeed(seed);
   setTempo(tempo);
+  setSwing(Number(swingInput.value));
 
   if (isPlaying()) {
     restart();
@@ -154,7 +170,7 @@ toggleButton.addEventListener("click", async () => {
     stop();
     setPlayingUI(false);
   } else {
-    play(currentSeed(), currentTempo());
+    play(currentSeed(), currentTempo(), currentSwing());
   }
 });
 
@@ -188,19 +204,23 @@ randomSeedButton.addEventListener("click", () => {
 });
 
 setOnSongEnd(() => {
-  record(currentSeed(), currentTempo());
-  play(randomSeed(), randomTempo());
+  record(currentSeed(), currentTempo(), currentSwing());
+  play(randomSeed(), randomTempo(), currentSwing());
 });
 
 const params = new URLSearchParams(location.search);
 const seedParam = params.get("seed");
 const tempoParam = Number(params.get("tempo"));
+const swingRaw = params.get("swing");
+const swingParam = Number(swingRaw);
 
 seedInput.value = seedParam?.trim() || randomSeed();
 if (tempoParam > 0 && tempoParam <= 200) tempoInput.value = tempoParam;
+if (swingRaw && swingParam >= 0 && swingParam <= 1) swingInput.value = swingParam;
 
 applySeed(seedInput.value);
 setTempo(Number(tempoInput.value));
+setSwing(Number(swingInput.value));
 renderHistory();
 
 
