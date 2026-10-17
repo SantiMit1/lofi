@@ -165,6 +165,10 @@ export function setSeed(value) {
   composer = createComposer(seed);
 }
 
+export function getInstruments() {
+  return composer.instruments;
+}
+
 export function setOnSongEnd(callback) {
   onSongEnd = callback;
 }

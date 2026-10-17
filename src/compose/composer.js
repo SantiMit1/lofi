@@ -30,6 +30,13 @@ const OPTIONAL = {
   keys2: 0.35,
 };
 
+// Capas de OPTIONAL ya cableadas a audio. El resto se sigue sorteando (para no
+// correr el stream del rng cuando se implementen) pero todavia no suena.
+const LIVE_LAYERS = ["arp"];
+
+// Instrumentos que suenan en toda cancion, en orden de presentacion.
+const ESSENTIALS = ["drums", "bass", "keys", "lead"];
+
 function pickLineup(rng) {
   const lineup = new Set();
 
@@ -57,6 +64,7 @@ function humanize(events, rng) {
 export function createComposer(seed = 1) {
   const rng = createRng(seed);
   const lineup = pickLineup(rng);
+  const instruments = ESSENTIALS.concat(LIVE_LAYERS.filter((layer) => lineup.has(layer)));
   const chords = new MarkovChain(CHORD_TRANSITIONS_2, {
     fallback: (key) => CHORD_TRANSITIONS[key.split("|")[1]],
   });
@@ -136,5 +144,5 @@ export function createComposer(seed = 1) {
     return { degree: currentChord, pattern: currentPattern, section, events, last: barIndex === plan.length };
   }
 
-  return { nextBar };
+  return { nextBar, instruments };
 }

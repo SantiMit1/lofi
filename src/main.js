@@ -1,5 +1,5 @@
 import { unlock, setVolume } from "./audio/engine.js";
-import { start, stop, restart, setTempo, setSeed, setSwing, setOnSongEnd, isPlaying } from "./core/scheduler.js";
+import { start, stop, restart, setTempo, setSeed, setSwing, setOnSongEnd, isPlaying, getInstruments } from "./core/scheduler.js";
 import { init as initVisualizer, start as startVisualizer, stop as stopVisualizer, refreshTheme } from "./visualizer.js";
 
 const toggleButton = document.querySelector("#toggleButton");
@@ -10,6 +10,20 @@ const seedInput = document.querySelector("#seed");
 const randomSeedButton = document.querySelector("#randomSeed");
 const themeToggle = document.querySelector("#themeToggle");
 const historyList = document.querySelector("#historyList");
+const instrumentsList = document.querySelector("#instruments");
+
+// Nombre visible de cada instrumento interno.
+const INSTRUMENT_LABELS = {
+  drums: "Batería",
+  bass: "Bajo",
+  keys: "Teclas",
+  lead: "Melodía",
+  arp: "Arpegio",
+  pad: "Pad",
+  perc: "Percusión",
+  guitar: "Guitarra",
+  keys2: "Rhodes",
+};
 
 const HISTORY_MAX = 5;
 const HISTORY_KEY = "lofi-history";
@@ -131,6 +145,18 @@ function setPlayingUI(playing) {
   if (playing) startVisualizer();
   else stopVisualizer();
   renderHistory();
+  renderInstruments();
+}
+
+function renderInstruments() {
+  instrumentsList.replaceChildren(
+    ...getInstruments().map((name) => {
+      const item = document.createElement("li");
+      item.className = "lineup__item";
+      item.textContent = INSTRUMENT_LABELS[name] ?? name;
+      return item;
+    })
+  );
 }
 
 function record(seed, tempo, swing) {
@@ -165,6 +191,7 @@ function applySeed(value) {
 
   setSeed(seed);
   restart();
+  renderInstruments();
 }
 
 toggleButton.addEventListener("click", async () => {

@@ -263,6 +263,31 @@ input[type="range"]:focus-visible::-moz-range-thumb {
   background: var(--border);
 }
 
+.lineup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.lineup__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lineup__item {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
 .history {
   margin-top: 26px;
   padding-top: 22px;
