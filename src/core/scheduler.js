@@ -81,17 +81,28 @@ function scheduler() {
   }
 }
 
+function run() {
+  current16th = 0;
+  barQueue = [];
+  queueIndex = 0;
+  nextNoteTime = getContext().currentTime + 0.05;
+  timerID = setInterval(scheduler, LOOKAHEAD_MS);
+}
+
 export function start() {
   if (isRunning) return;
 
   initMixer();
   setAmbience(true);
   isRunning = true;
-  current16th = 0;
-  barQueue = [];
-  queueIndex = 0;
-  nextNoteTime = getContext().currentTime + 0.05;
-  timerID = setInterval(scheduler, LOOKAHEAD_MS);
+  run();
+}
+
+export function restart() {
+  if (!isRunning) return;
+
+  clearInterval(timerID);
+  run();
 }
 
 export function stop() {

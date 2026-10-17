@@ -1,5 +1,5 @@
 import { unlock, setVolume } from "./audio/engine.js";
-import { start, stop, setTempo, setSeed, isPlaying } from "./core/scheduler.js";
+import { start, stop, restart, setTempo, setSeed, isPlaying } from "./core/scheduler.js";
 
 const toggleButton = document.querySelector("#toggleButton");
 const tempoInput = document.querySelector("#tempo");
@@ -13,7 +13,10 @@ function randomSeed() {
 
 function applySeed(value) {
   const seed = value.trim();
-  if (seed) setSeed(seed);
+  if (!seed) return;
+
+  setSeed(seed);
+  restart();
 }
 
 toggleButton.addEventListener("click", async () => {
@@ -32,12 +35,15 @@ toggleButton.addEventListener("click", async () => {
 
 tempoInput.addEventListener("change", () => {
   const bpm = Number(tempoInput.value);
+
   if (bpm > 0 && bpm <= 200) {
     setTempo(bpm);
   } else {
     setTempo(90);
     tempoInput.value = 90;
   }
+
+  restart();
 });
 
 volumeInput.addEventListener("input", () => {
