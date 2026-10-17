@@ -13,6 +13,7 @@ const KEY_ROOT = 60; // C4
 const HUMANIZE = {
   keys: { time: 0.008, vel: 0.1 },
   lead: { time: 0.018, vel: 0.12 },
+  arp: { time: 0.012, vel: 0.1 },
   bass: { time: 0.01, vel: 0.08 },
   drum: { time: 0, vel: 0.08 },
 };
@@ -99,6 +100,23 @@ export function createComposer(seed = 1) {
     const bassSecond = rng.next() < 0.5 ? root : root + 7;
     events.push({ instrument: "bass", midi: root - 24, at: 0, length: 1.8, vel: 0.6 });
     events.push({ instrument: "bass", midi: bassSecond - 24, at: 2, length: 1.6, vel: 0.5 });
+
+    // arpegio: recorre el voicing abierto del acorde, una octava arriba, en corcheas
+    if (active("arp", rules)) {
+      const tones = voiceOpen(triad).map((midi) => midi + 12);
+
+      for (let step = 0; step < 8; step++) {
+        if (rng.next() < 0.25) continue;
+
+        events.push({
+          instrument: "arp",
+          midi: tones[step % tones.length],
+          at: step * 0.5,
+          length: 0.45,
+          vel: 0.3,
+        });
+      }
+    }
 
     for (const [voice, steps] of Object.entries(DRUM_PATTERNS[currentPattern])) {
       if (!rules.drums.includes(voice)) continue;
