@@ -1,5 +1,7 @@
 import { getContext } from "../audio/engine.js";
 import { playKeys } from "../audio/instruments/keys.js";
+import { playBass } from "../audio/instruments/bass.js";
+import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
 import { createComposer } from "../compose/composer.js";
 
 let tempo = 90;
@@ -13,18 +15,36 @@ let composer = createComposer(1);
 const LOOKAHEAD_MS = 25;
 const SCHEDULE_AHEAD = 0.1;
 
+const DRUM_VOICES = {
+  kick: playKick,
+  snare: playSnare,
+  hat: playHat,
+  openHat: playOpenHat,
+};
+
 function advance() {
   nextNoteTime += 0.25 * (60 / tempo);
   current16th = (current16th + 1) % 16;
 }
 
+function playEvent(event, time) {
+  const beat = 60 / tempo;
+
+  if (event.instrument === "keys") {
+    playKeys(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "bass") {
+    playBass(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "drum") {
+    DRUM_VOICES[event.voice](time, event.vel);
+  }
+}
+
 function scheduleBar(barStart) {
   const beat = 60 / tempo;
-  const { notes } = composer.nextChord();
+  const { events } = composer.nextBar();
 
-  for (const midi of notes) {
-    playKeys(midi, barStart, beat * 2 * 0.95, 0.45);
-    playKeys(midi, barStart + beat * 2, beat * 1.6, 0.3);
+  for (const event of events) {
+    playEvent(event, barStart + event.at * beat);
   }
 }
 
@@ -42,7 +62,7 @@ export function start() {
 
   isRunning = true;
   current16th = 0;
-  nextNoteTime = getContext().currentTime + 0.05; // arranca un pelín a futuro
+  nextNoteTime = getContext().currentTime + 0.05;
   timerID = setInterval(scheduler, LOOKAHEAD_MS);
 }
 

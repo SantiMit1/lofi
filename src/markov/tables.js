@@ -12,3 +12,10 @@ export const CHORD_TRANSITIONS = {
   vi: [["ii", 3], ["IV", 3], ["V", 2], ["I", 1]],
   vii: [["I", 4], ["iii", 2], ["vi", 1]],
 };
+
+// Estado = nombre de patrón de batería (ver compose/patterns.js).
+export const DRUM_TRANSITIONS = {
+  boomBap: [["boomBap", 3], ["halfTime", 2], ["sparse", 1]],
+  halfTime: [["halfTime", 2], ["boomBap", 3], ["sparse", 1]],
+  sparse: [["boomBap", 3], ["halfTime", 2], ["sparse", 1]],
+};
