@@ -10,10 +10,10 @@ export const FORM = [
 // Reglas por seccion: voces de bateria que suenan, densidad de la melodia
 // (divide el chance de silencio) y si entra el hi-hat abierto de pickup.
 export const SECTION_RULES = {
-  intro: { drums: [], density: 0.45, openHat: false },
-  A: { drums: ["kick", "snare", "hat"], density: 1, openHat: false },
-  B: { drums: ["kick", "snare", "hat"], density: 1.4, openHat: true },
-  outro: { drums: [], density: 0.45, openHat: false },
+  intro: { drums: [], density: 0.45, openHat: false, layers: [] },
+  A: { drums: ["kick", "snare", "hat"], density: 1, openHat: false, layers: ["arp"] },
+  B: { drums: ["kick", "snare", "hat"], density: 1.4, openHat: true, layers: ["arp", "pad"] },
+  outro: { drums: [], density: 0.45, openHat: false, layers: [] },
 };
 
 // Nombre de la seccion que le toca a cada compas, de corrido.

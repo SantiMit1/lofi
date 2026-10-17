@@ -19,6 +19,26 @@ const HUMANIZE = {
 
 const STRUM_STEP = 0.02;
 
+// Capas opcionales: probabilidad de que entren en esta cancion. Los esenciales
+// (drums, bass, keys, lead) no pasan por aca.
+const OPTIONAL = {
+  arp: 0.45,
+  pad: 0.5,
+  perc: 0.4,
+  guitar: 0.35,
+  keys2: 0.35,
+};
+
+function pickLineup(rng) {
+  const lineup = new Set();
+
+  for (const [layer, chance] of Object.entries(OPTIONAL)) {
+    if (rng.next() < chance) lineup.add(layer);
+  }
+
+  return lineup;
+}
+
 function humanize(events, rng) {
   for (const event of events) {
     const cfg = HUMANIZE[event.instrument];
@@ -35,6 +55,7 @@ function humanize(events, rng) {
 
 export function createComposer(seed = 1) {
   const rng = createRng(seed);
+  const lineup = pickLineup(rng);
   const chords = new MarkovChain(CHORD_TRANSITIONS_2, {
     fallback: (key) => CHORD_TRANSITIONS[key.split("|")[1]],
   });
@@ -45,6 +66,11 @@ export function createComposer(seed = 1) {
   let currentChord = "I";
   let previousChord = "I";
   let currentPattern = "boomBap";
+
+  // Una capa opcional suena solo si entro en el lineup y la seccion la habilita.
+  function active(layer, rules) {
+    return lineup.has(layer) && rules.layers.includes(layer);
+  }
 
   // Decide un compás completo. Devuelve eventos con offsets en beats.
   function nextBar() {
