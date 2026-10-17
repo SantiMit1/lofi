@@ -6,6 +6,7 @@ const tempoInput = document.querySelector("#tempo");
 const volumeInput = document.querySelector("#volume");
 const seedInput = document.querySelector("#seed");
 const randomSeedButton = document.querySelector("#randomSeed");
+const themeToggle = document.querySelector("#themeToggle");
 
 function randomSeed() {
   return String(Math.floor(Math.random() * 1000000));
@@ -59,3 +60,25 @@ randomSeedButton.addEventListener("click", () => {
 
 seedInput.value = randomSeed();
 applySeed(seedInput.value);
+
+
+//TEMA
+const THEME_KEY = "lofi-theme";
+
+function applyTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.dataset.theme = "dark";
+  } else {
+    delete document.documentElement.dataset.theme;
+  }
+
+  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+themeToggle.addEventListener("click", () => {
+  const isDark = document.documentElement.dataset.theme === "dark";
+  applyTheme(isDark ? "light" : "dark");
+});
+
+applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");

@@ -5,12 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LoFi Gen</title>
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    if (localStorage.getItem("lofi-theme") === "dark") {
+      document.documentElement.dataset.theme = "dark";
+    }
+  </script>
 </head>
 <body>
   <main class="app">
     <header class="app__header">
-      <h1 class="app__title">LoFi Gen</h1>
-      <p class="app__subtitle">lo-fi generator with Markov chains</p>
+      <div>
+        <h1 class="app__title">LoFi Gen</h1>
+        <p class="app__subtitle">Generador de lo-fi con cadenas de Markov</p>
+      </div>
+
+      <button id="themeToggle" class="button button--icon" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
     </header>
 
     <div class="controls">
@@ -23,7 +32,7 @@
         </div>
 
         <div class="field">
-          <label class="field__label" for="volume">Volume</label>
+          <label class="field__label" for="volume">Volumen</label>
           <input id="volume" type="range" min="0" max="1" step="0.01" value="0.1" />
         </div>
       </div>
