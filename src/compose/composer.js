@@ -1,5 +1,5 @@
 import { MarkovChain } from "../markov/MarkovChain.js";
-import { CHORD_TRANSITIONS, DRUM_TRANSITIONS } from "../markov/tables.js";
+import { CHORD_TRANSITIONS, CHORD_TRANSITIONS_2, DRUM_TRANSITIONS } from "../markov/tables.js";
 import { DRUM_PATTERNS } from "./patterns.js";
 import { createMelody } from "./melody.js";
 import { chordNotes, voiceOpen } from "../theory/scales.js";
@@ -34,15 +34,21 @@ function humanize(events, rng) {
 
 export function createComposer(seed = 1) {
   const rng = createRng(seed);
-  const chords = new MarkovChain(CHORD_TRANSITIONS);
+  const chords = new MarkovChain(CHORD_TRANSITIONS_2, {
+    fallback: (key) => CHORD_TRANSITIONS[key.split("|")[1]],
+  });
   const drumPatterns = new MarkovChain(DRUM_TRANSITIONS);
   const melody = createMelody();
   let currentChord = "I";
+  let previousChord = "I";
   let currentPattern = "boomBap";
 
   // Decide un compás completo. Devuelve eventos con offsets en beats.
   function nextBar() {
-    currentChord = chords.sample(currentChord, rng);
+    const key = `${previousChord}|${currentChord}`;
+    previousChord = currentChord;
+    currentChord = chords.sample(key, rng);
+
     currentPattern = drumPatterns.sample(currentPattern, rng);
 
     const triad = chordNotes(currentChord, KEY_ROOT);

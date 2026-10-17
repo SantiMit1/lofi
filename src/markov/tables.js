@@ -2,7 +2,6 @@
 // que suenen a progresiones lo-fi / jazz
 //
 // Estado = numeral romano en modo mayor. Cada fila lista [siguiente, peso].
-// TODO: subir a orden 2 (estado = par de grados) en un milestone posterior.
 export const CHORD_TRANSITIONS = {
   I: [["vi", 3], ["IV", 3], ["ii", 2], ["V", 2], ["iii", 1]],
   ii: [["V", 5], ["vii", 1], ["IV", 1]],
@@ -11,6 +10,45 @@ export const CHORD_TRANSITIONS = {
   V: [["I", 4], ["vi", 3], ["ii", 1], ["IV", 1]],
   vi: [["ii", 3], ["IV", 3], ["V", 2], ["I", 1]],
   vii: [["I", 4], ["iii", 2], ["vi", 1]],
+};
+
+// Cadena de acordes de orden 2: el estado es el par "anterior|actual".
+// Mirar dos acordes atrás hace que suene a progresión y no a caminata
+// aleatoria. Cubre todos los pares alcanzables; si faltara una fila, el
+// sampler cae a CHORD_TRANSITIONS (orden 1) usando el último acorde.
+export const CHORD_TRANSITIONS_2 = {
+  "I|vi": [["ii", 4], ["IV", 3], ["V", 2]],
+  "I|IV": [["V", 4], ["I", 3], ["ii", 2]],
+  "I|ii": [["V", 5], ["IV", 2], ["vii", 1]],
+  "I|V": [["I", 5], ["vi", 3], ["IV", 1]],
+  "I|iii": [["vi", 4], ["IV", 3], ["ii", 2]],
+
+  "ii|V": [["I", 6], ["vi", 2], ["IV", 1]],
+  "ii|vii": [["I", 5], ["iii", 2], ["vi", 1]],
+  "ii|IV": [["V", 4], ["I", 3], ["ii", 1]],
+
+  "iii|vi": [["ii", 4], ["IV", 3], ["V", 2]],
+  "iii|IV": [["V", 4], ["I", 3]],
+  "iii|ii": [["V", 5], ["IV", 2]],
+
+  "IV|V": [["I", 6], ["vi", 2], ["IV", 1]],
+  "IV|I": [["IV", 3], ["vi", 3], ["ii", 2], ["V", 2], ["iii", 2]],
+  "IV|ii": [["V", 4], ["IV", 2], ["vii", 1]],
+  "IV|vi": [["ii", 4], ["V", 3], ["I", 2]],
+
+  "V|I": [["vi", 4], ["IV", 3], ["ii", 2], ["iii", 1], ["V", 1]],
+  "V|vi": [["IV", 4], ["ii", 3], ["V", 2]],
+  "V|ii": [["V", 5], ["IV", 2]],
+  "V|IV": [["V", 4], ["I", 3]],
+
+  "vi|ii": [["V", 4], ["IV", 2], ["vii", 1]],
+  "vi|IV": [["V", 4], ["I", 3], ["ii", 1]],
+  "vi|V": [["I", 4], ["vi", 3], ["IV", 1]],
+  "vi|I": [["IV", 4], ["vi", 2], ["ii", 2], ["iii", 1], ["V", 1]],
+
+  "vii|I": [["IV", 4], ["vi", 2], ["ii", 2], ["iii", 1], ["V", 1]],
+  "vii|iii": [["vi", 4], ["IV", 3], ["ii", 2]],
+  "vii|vi": [["ii", 4], ["IV", 3], ["V", 2]],
 };
 
 // Estado = nombre de patrón de batería (ver compose/patterns.js).
