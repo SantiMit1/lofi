@@ -10,8 +10,23 @@ const randomSeedButton = document.querySelector("#randomSeed");
 const themeToggle = document.querySelector("#themeToggle");
 const historyList = document.querySelector("#historyList");
 
-const HISTORY_MAX = 12;
-const history = [];
+const HISTORY_MAX = 5;
+const HISTORY_KEY = "lofi-history";
+
+let history = loadHistory();
+
+function loadHistory() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HISTORY_KEY));
+    return Array.isArray(saved) ? saved.slice(0, HISTORY_MAX) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory() {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
 
 function randomSeed() {
   return String(Math.floor(Math.random() * 1000000));
@@ -32,13 +47,13 @@ function currentTempo() {
 function renderHistory() {
   historyList.replaceChildren();
 
-  history.forEach((entry, index) => {
+  history.forEach((entry) => {
     const item = document.createElement("li");
     const button = document.createElement("button");
 
     button.type = "button";
     button.className = "history__item";
-    if (index === 0 && isPlaying()) button.classList.add("is-current");
+    if (entry.seed === currentSeed() && entry.tempo === currentTempo()) button.classList.add("is-current");
     button.textContent = `${entry.seed} · ${entry.tempo} bpm`;
     button.addEventListener("click", () => play(entry.seed, entry.tempo));
 
@@ -59,6 +74,7 @@ function record(seed, tempo) {
 
   history.unshift({ seed, tempo });
   if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
+  saveHistory();
 }
 
 function play(seed, tempo) {
@@ -73,7 +89,6 @@ function play(seed, tempo) {
     start();
   }
 
-  record(seed, tempo);
   setPlayingUI(true);
 }
 
@@ -125,7 +140,10 @@ randomSeedButton.addEventListener("click", () => {
   applySeed(seed);
 });
 
-setOnSongEnd(() => play(randomSeed(), randomTempo()));
+setOnSongEnd(() => {
+  record(currentSeed(), currentTempo());
+  play(randomSeed(), randomTempo());
+});
 
 seedInput.value = randomSeed();
 applySeed(seedInput.value);
