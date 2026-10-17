@@ -41,7 +41,7 @@ function buildMaster() {
   comp.release.value = 0.25;
 
   masterGain = c.createGain();
-  masterGain.gain.value = 0.8;
+  masterGain.gain.value = 0.1;
 
   master.connect(wow.input);
   wow.output.connect(tone);
