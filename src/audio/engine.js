@@ -19,6 +19,11 @@ export function getMaster() {
   return master;
 }
 
+export function setVolume(value) {
+  const m = getMaster();
+  m.gain.setTargetAtTime(value, getContext().currentTime, 0.01);
+}
+
 export async function unlock() {
   const c = getContext();
   if (c.state === 'suspended') {
