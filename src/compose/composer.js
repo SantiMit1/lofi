@@ -16,6 +16,7 @@ const HUMANIZE = {
   arp: { time: 0.012, vel: 0.1 },
   pad: { time: 0.02, vel: 0.06 },
   perc: { time: 0.006, vel: 0.12 },
+  guitar: { time: 0.015, vel: 0.12 },
   bass: { time: 0.01, vel: 0.08 },
   drum: { time: 0, vel: 0.08 },
 };
@@ -34,7 +35,7 @@ const OPTIONAL = {
 
 // Capas de OPTIONAL ya cableadas a audio. El resto se sigue sorteando (para no
 // correr el stream del rng cuando se implementen) pero todavia no suena.
-const LIVE_LAYERS = ["arp", "pad", "perc"];
+const LIVE_LAYERS = ["arp", "pad", "perc", "guitar"];
 
 // Instrumentos que suenan en toda cancion, en orden de presentacion.
 const ESSENTIALS = ["drums", "bass", "keys", "lead"];
@@ -154,6 +155,24 @@ export function createComposer(seed = 1) {
 
       if (rng.next() < 0.3) {
         events.push({ instrument: "perc", voice: "rimshot", at: 2.5, length: 0.2, vel: 0.35 });
+      }
+    }
+
+    // guitarra: punteo del voicing, otra textura sobre el mismo acorde
+    if (active("guitar", rules)) {
+      const tones = voiceOpen(triad).map((midi) => midi + 12);
+      const pattern = [0, 2, 1, 2];
+
+      for (let step = 0; step < 8; step++) {
+        if (rng.next() < 0.35) continue;
+
+        events.push({
+          instrument: "guitar",
+          midi: tones[pattern[step % pattern.length]],
+          at: step * 0.5,
+          length: 0.9,
+          vel: 0.3,
+        });
       }
     }
 

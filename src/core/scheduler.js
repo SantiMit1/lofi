@@ -4,6 +4,7 @@ import { playPad } from "../audio/instruments/pad.js";
 import { playBass } from "../audio/instruments/bass.js";
 import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
 import { playShaker, playTambourine, playRimshot } from "../audio/instruments/perc.js";
+import { playGuitar } from "../audio/instruments/guitar.js";
 import { initMixer } from "../audio/mixer.js";
 import { createComposer } from "../compose/composer.js";
 
@@ -65,6 +66,8 @@ function playEvent(event, time) {
     playPad(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "bass") {
     playBass(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "guitar") {
+    playGuitar(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "perc") {
     PERC_VOICES[event.voice](time, event.vel);
   } else if (event.instrument === "drum") {
