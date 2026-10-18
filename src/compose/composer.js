@@ -15,6 +15,7 @@ const HUMANIZE = {
   lead: { time: 0.018, vel: 0.12 },
   arp: { time: 0.012, vel: 0.1 },
   pad: { time: 0.02, vel: 0.06 },
+  perc: { time: 0.006, vel: 0.12 },
   bass: { time: 0.01, vel: 0.08 },
   drum: { time: 0, vel: 0.08 },
 };
@@ -33,7 +34,7 @@ const OPTIONAL = {
 
 // Capas de OPTIONAL ya cableadas a audio. El resto se sigue sorteando (para no
 // correr el stream del rng cuando se implementen) pero todavia no suena.
-const LIVE_LAYERS = ["arp", "pad"];
+const LIVE_LAYERS = ["arp", "pad", "perc"];
 
 // Instrumentos que suenan en toda cancion, en orden de presentacion.
 const ESSENTIALS = ["drums", "bass", "keys", "lead"];
@@ -132,6 +133,28 @@ export function createComposer(seed = 1) {
       voiceOpen(triad).forEach((midi, i) => {
         events.push({ instrument: "pad", midi, at: i * 0.06, length: 3.7, vel: 0.3 });
       });
+    }
+
+    // percusión suelta: shaker o pandereta en corcheas, más un rimshot de color
+    if (active("perc", rules)) {
+      const hat = rng.next() < 0.5 ? "shaker" : "tambourine";
+
+      for (let step = 0; step < 8; step++) {
+        const onBeat = step % 2 === 0;
+        if (rng.next() >= (onBeat ? 0.75 : 0.5)) continue;
+
+        events.push({
+          instrument: "perc",
+          voice: hat,
+          at: step * 0.5,
+          length: 0.2,
+          vel: onBeat ? 0.3 : 0.2,
+        });
+      }
+
+      if (rng.next() < 0.3) {
+        events.push({ instrument: "perc", voice: "rimshot", at: 2.5, length: 0.2, vel: 0.35 });
+      }
     }
 
     for (const [voice, steps] of Object.entries(DRUM_PATTERNS[currentPattern])) {

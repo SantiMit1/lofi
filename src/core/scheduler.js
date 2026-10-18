@@ -3,6 +3,7 @@ import { playKeys } from "../audio/instruments/keys.js";
 import { playPad } from "../audio/instruments/pad.js";
 import { playBass } from "../audio/instruments/bass.js";
 import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
+import { playShaker, playTambourine, playRimshot } from "../audio/instruments/perc.js";
 import { initMixer } from "../audio/mixer.js";
 import { createComposer } from "../compose/composer.js";
 
@@ -33,6 +34,12 @@ const DRUM_VOICES = {
   openHat: playOpenHat,
 };
 
+const PERC_VOICES = {
+  shaker: playShaker,
+  tambourine: playTambourine,
+  rimshot: playRimshot,
+};
+
 function advance() {
   nextNoteTime += 0.25 * (60 / tempo);
   current16th = (current16th + 1) % 16;
@@ -58,6 +65,8 @@ function playEvent(event, time) {
     playPad(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "bass") {
     playBass(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "perc") {
+    PERC_VOICES[event.voice](time, event.vel);
   } else if (event.instrument === "drum") {
     DRUM_VOICES[event.voice](time, event.vel);
   }
