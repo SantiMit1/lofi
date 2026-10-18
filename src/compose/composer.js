@@ -34,8 +34,7 @@ const OPTIONAL = {
   keys2: 0.35,
 };
 
-// Capas de OPTIONAL ya cableadas a audio. El resto se sigue sorteando (para no
-// correr el stream del rng cuando se implementen) pero todavia no suena.
+// Capas opcionales cableadas a audio, en el orden en que se listan en la UI.
 const LIVE_LAYERS = ["arp", "pad", "perc", "guitar", "keys2"];
 
 // Instrumentos que suenan en toda cancion, en orden de presentacion.

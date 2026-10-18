@@ -51,7 +51,7 @@ de orden 2, batería, bajo, melodía, humanización) → `src/audio/*` (síntesi
   que escale con el tempo.
 - **El azar generativo sale solo de `createRng(seed)`.** `Math.random()` aparece únicamente en
   `main.js` (elegir seed/tempo de la próxima canción) y en generadores de material de audio
-  (`noise.js`, `reverb.js`, `tapeNoise.js`). Si agregás `Math.random()` en `compose/` o `markov/`,
+  (`noise.js`, `reverb.js`, `tapeNoise.js`, `guitar.js`). Si agregás `Math.random()` en `compose/` o `markov/`,
   "misma seed = misma canción" deja de valer.
 - **Cambiar el modelo cambia todas las seeds.** Tocar las tablas, o incluso el orden o la cantidad de
   llamadas al `rng`, cambia lo que produce cada seed: los links compartidos viejos suenan distinto.
