@@ -17,6 +17,7 @@ const HUMANIZE = {
   pad: { time: 0.02, vel: 0.06 },
   perc: { time: 0.006, vel: 0.12 },
   guitar: { time: 0.015, vel: 0.12 },
+  keys2: { time: 0.01, vel: 0.1 },
   bass: { time: 0.01, vel: 0.08 },
   drum: { time: 0, vel: 0.08 },
 };
@@ -35,7 +36,7 @@ const OPTIONAL = {
 
 // Capas de OPTIONAL ya cableadas a audio. El resto se sigue sorteando (para no
 // correr el stream del rng cuando se implementen) pero todavia no suena.
-const LIVE_LAYERS = ["arp", "pad", "perc", "guitar"];
+const LIVE_LAYERS = ["arp", "pad", "perc", "guitar", "keys2"];
 
 // Instrumentos que suenan en toda cancion, en orden de presentacion.
 const ESSENTIALS = ["drums", "bass", "keys", "lead"];
@@ -172,6 +173,30 @@ export function createComposer(seed = 1) {
           at: step * 0.5,
           length: 0.9,
           vel: 0.3,
+        });
+      }
+    }
+
+    // segunda capa de teclas: responde al comping desde los contratiempos
+    if (active("keys2", rules)) {
+      const tones = voiceOpen(triad);
+      const octave = rng.next() < 0.5 ? 12 : 0;
+
+      events.push({
+        instrument: "keys2",
+        midi: tones[2] + octave,
+        at: 1.5,
+        length: 0.9,
+        vel: 0.25,
+      });
+
+      if (rng.next() < 0.5) {
+        events.push({
+          instrument: "keys2",
+          midi: tones[1] + octave,
+          at: 3.5,
+          length: 0.9,
+          vel: 0.2,
         });
       }
     }

@@ -64,6 +64,8 @@ function playEvent(event, time) {
     playKeys(event.midi, time, event.length * beat, event.vel, "arp");
   } else if (event.instrument === "pad") {
     playPad(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "keys2") {
+    playKeys(event.midi, time, event.length * beat, event.vel, "keys2");
   } else if (event.instrument === "bass") {
     playBass(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "guitar") {

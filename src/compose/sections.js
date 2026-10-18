@@ -15,13 +15,13 @@ export const SECTION_RULES = {
     drums: ["kick", "snare", "hat"],
     density: 1,
     openHat: false,
-    layers: ["arp", "perc", "guitar"],
+    layers: ["arp", "perc", "guitar", "keys2"],
   },
   B: {
     drums: ["kick", "snare", "hat"],
     density: 1.4,
     openHat: true,
-    layers: ["arp", "pad", "perc", "guitar"],
+    layers: ["arp", "pad", "perc", "guitar", "keys2"],
   },
   outro: { drums: [], density: 0.45, openHat: false, layers: [] },
 };
