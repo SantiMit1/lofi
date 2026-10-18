@@ -79,6 +79,7 @@ export function createComposer(seed = 1) {
   let currentChord = "I";
   let previousChord = "I";
   let currentPattern = "boomBap";
+  let previousSection = null;
 
   // Una capa opcional suena solo si entro en el lineup y la seccion la habilita.
   function active(layer, rules) {
@@ -90,6 +91,9 @@ export function createComposer(seed = 1) {
     const section = plan[barIndex];
     const rules = SECTION_RULES[section];
     barIndex++;
+
+    const sectionChanged = section !== previousSection;
+    previousSection = section;
 
     const key = `${previousChord}|${currentChord}`;
     previousChord = currentChord;
@@ -214,6 +218,21 @@ export function createComposer(seed = 1) {
     }
 
     events.push(...melody.phrase(currentChord, rng, rules.density));
+
+    // SFX decorativos: rebobinado al abrir un extremo, tape stop al cerrar la
+    // canción y lluvia sobre la intro. Salen directo al master, sin humanizar.
+    if (sectionChanged && (section === "intro" || section === "outro") && rng.next() < 0.35) {
+      events.push({ instrument: "sfx", voice: "rewind", at: 0, length: 0.5, vel: 0.3 });
+    }
+
+    if (sectionChanged && section === "intro" && rng.next() < 0.3) {
+      events.push({ instrument: "sfx", voice: "rain", at: 0, length: 3.5, vel: 0.25 });
+    }
+
+    if (barIndex === plan.length && rng.next() < 0.6) {
+      events.push({ instrument: "sfx", voice: "tapeStop", at: 3, length: 1, vel: 0.5 });
+    }
+
     humanize(events, rng);
 
     return { degree: currentChord, pattern: currentPattern, section, events, last: barIndex === plan.length };

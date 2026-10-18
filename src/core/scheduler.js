@@ -5,6 +5,7 @@ import { playBass } from "../audio/instruments/bass.js";
 import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
 import { playShaker, playTambourine, playRimshot } from "../audio/instruments/perc.js";
 import { playGuitar } from "../audio/instruments/guitar.js";
+import { playTapeStop, playRewind, playRain } from "../audio/instruments/sfx.js";
 import { initMixer } from "../audio/mixer.js";
 import { createComposer } from "../compose/composer.js";
 
@@ -41,6 +42,12 @@ const PERC_VOICES = {
   rimshot: playRimshot,
 };
 
+const SFX_VOICES = {
+  tapeStop: playTapeStop,
+  rewind: playRewind,
+  rain: playRain,
+};
+
 function advance() {
   nextNoteTime += 0.25 * (60 / tempo);
   current16th = (current16th + 1) % 16;
@@ -72,6 +79,8 @@ function playEvent(event, time) {
     playGuitar(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "perc") {
     PERC_VOICES[event.voice](time, event.vel);
+  } else if (event.instrument === "sfx") {
+    SFX_VOICES[event.voice](time, event.length * beat, event.vel);
   } else if (event.instrument === "drum") {
     DRUM_VOICES[event.voice](time, event.vel);
   }
