@@ -1,5 +1,6 @@
 import { getContext, setAmbience } from "../audio/engine.js";
 import { playKeys } from "../audio/instruments/keys.js";
+import { playPad } from "../audio/instruments/pad.js";
 import { playBass } from "../audio/instruments/bass.js";
 import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
 import { initMixer } from "../audio/mixer.js";
@@ -53,6 +54,8 @@ function playEvent(event, time) {
     playKeys(event.midi, time, event.length * beat, event.vel, "lead");
   } else if (event.instrument === "arp") {
     playKeys(event.midi, time, event.length * beat, event.vel, "arp");
+  } else if (event.instrument === "pad") {
+    playPad(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "bass") {
     playBass(event.midi, time, event.length * beat, event.vel);
   } else if (event.instrument === "drum") {

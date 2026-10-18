@@ -6,6 +6,7 @@ const CONFIG = {
   keys: { level: 0.9, pan: -0.15, reverb: 0.35 },
   lead: { level: 0.7, pan: 0.2, reverb: 0.5 },
   arp: { level: 0.5, pan: 0.25, reverb: 0.5 },
+  pad: { level: 0.35, pan: 0.1, reverb: 0.6 },
   bass: { level: 1.0, pan: 0.0, reverb: 0.05 },
   drums: { level: 0.9, pan: 0.0, reverb: 0.15 },
 };
