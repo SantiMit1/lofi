@@ -9,6 +9,9 @@ const swingInput = document.querySelector("#swing");
 const seedInput = document.querySelector("#seed");
 const randomSeedButton = document.querySelector("#randomSeed");
 const themeToggle = document.querySelector("#themeToggle");
+const focusToggle = document.querySelector("#focusToggle");
+const focusHud = document.querySelector("#focusHud");
+const nowPlaying = document.querySelector("#nowPlaying");
 const historyList = document.querySelector("#historyList");
 const instrumentsList = document.querySelector("#instruments");
 
@@ -137,6 +140,8 @@ function renderHistory() {
     item.append(playButton, copyButton);
     historyList.append(item);
   });
+
+  updateNowPlaying();
 }
 
 function setPlayingUI(playing) {
@@ -146,6 +151,18 @@ function setPlayingUI(playing) {
   else stopVisualizer();
   renderHistory();
   renderInstruments();
+  updateNowPlaying();
+}
+
+function updateNowPlaying() {
+  const seed = currentSeed() || "—";
+  nowPlaying.textContent = `now playing: ${seed} - ${currentTempo()}bpm`;
+}
+
+function setFocusMode(on) {
+  document.body.classList.toggle("is-focus", on);
+  focusHud.hidden = !on;
+  if (on) updateNowPlaying();
 }
 
 function renderInstruments() {
@@ -192,6 +209,7 @@ function applySeed(value) {
   setSeed(seed);
   restart();
   renderInstruments();
+  updateNowPlaying();
 }
 
 toggleButton.addEventListener("click", async () => {
@@ -216,6 +234,7 @@ tempoInput.addEventListener("change", () => {
   }
 
   restart();
+  updateNowPlaying();
 });
 
 volumeInput.addEventListener("input", () => {
@@ -283,3 +302,11 @@ themeToggle.addEventListener("click", () => {
 });
 
 applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+
+
+// MODO VISUALIZADOR
+focusToggle.addEventListener("click", () => setFocusMode(true));
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") setFocusMode(false);
+});

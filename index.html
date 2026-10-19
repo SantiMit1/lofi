@@ -21,7 +21,10 @@
         <p class="app__subtitle">Generador de lo-fi con cadenas de Markov</p>
       </div>
 
-      <button id="themeToggle" class="button button--icon" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+      <div class="app__actions">
+        <button id="themeToggle" class="button button--icon" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+        <button id="focusToggle" class="button button--icon" title="Modo visualizador" aria-label="Ocultar interfaz">🖥️</button>
+      </div>
     </header>
 
     <div class="controls">
@@ -63,6 +66,10 @@
       <ul id="historyList" class="history__list"></ul>
     </section>
   </main>
+
+  <div id="focusHud" class="focus-hud" hidden>
+    <span id="nowPlaying" class="focus-hud__now" aria-live="polite"></span>
+  </div>
 
   <footer class="footer">
     <a class="footer__link" href="https://github.com/SantiMit1/lofi" target="_blank" rel="noopener noreferrer">santimit</a>

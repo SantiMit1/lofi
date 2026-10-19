@@ -103,6 +103,47 @@ body {
   color: var(--muted);
 }
 
+.app__actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+/* Modo visualizador: la interfaz desaparece y solo queda el fondo animado. */
+body.is-focus .app,
+body.is-focus .footer {
+  display: none;
+}
+
+body.is-focus .viz.is-visible {
+  opacity: 1;
+}
+
+.focus-hud {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.focus-hud[hidden] {
+  display: none;
+}
+
+.focus-hud__now {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
 .controls {
   display: flex;
   flex-direction: column;
