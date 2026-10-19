@@ -1,7 +1,11 @@
 import { getContext, setAmbience } from "../audio/engine.js";
 import { playKeys } from "../audio/instruments/keys.js";
+import { playPad } from "../audio/instruments/pad.js";
 import { playBass } from "../audio/instruments/bass.js";
 import { playKick, playSnare, playHat, playOpenHat } from "../audio/instruments/drums.js";
+import { playShaker, playTambourine, playRimshot } from "../audio/instruments/perc.js";
+import { playGuitar } from "../audio/instruments/guitar.js";
+import { playTapeStop, playRewind, playRain } from "../audio/instruments/sfx.js";
 import { initMixer } from "../audio/mixer.js";
 import { createComposer } from "../compose/composer.js";
 
@@ -32,6 +36,18 @@ const DRUM_VOICES = {
   openHat: playOpenHat,
 };
 
+const PERC_VOICES = {
+  shaker: playShaker,
+  tambourine: playTambourine,
+  rimshot: playRimshot,
+};
+
+const SFX_VOICES = {
+  tapeStop: playTapeStop,
+  rewind: playRewind,
+  rain: playRain,
+};
+
 function advance() {
   nextNoteTime += 0.25 * (60 / tempo);
   current16th = (current16th + 1) % 16;
@@ -53,8 +69,18 @@ function playEvent(event, time) {
     playKeys(event.midi, time, event.length * beat, event.vel, "lead");
   } else if (event.instrument === "arp") {
     playKeys(event.midi, time, event.length * beat, event.vel, "arp");
+  } else if (event.instrument === "pad") {
+    playPad(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "keys2") {
+    playKeys(event.midi, time, event.length * beat, event.vel, "keys2");
   } else if (event.instrument === "bass") {
     playBass(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "guitar") {
+    playGuitar(event.midi, time, event.length * beat, event.vel);
+  } else if (event.instrument === "perc") {
+    PERC_VOICES[event.voice](time, event.vel);
+  } else if (event.instrument === "sfx") {
+    SFX_VOICES[event.voice](time, event.length * beat, event.vel);
   } else if (event.instrument === "drum") {
     DRUM_VOICES[event.voice](time, event.vel);
   }

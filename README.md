@@ -32,10 +32,12 @@ semilla ─▶ PRNG determinista
    mismas decisiones en el mismo orden.
 2. **Forma.** La canción se divide en bloques de compases (`intro` 4, `A` 8, `B` 8, `A` 8, `outro` 4).
    Cada sección tiene reglas propias: qué voces de batería entran, cuánta melódica se permite y qué
-   capas opcionales (arpegio, pad) suenan. Introducción y outro van casi desnudos, sin batería.
+   capas opcionales (arpegio, pad, percusión, guitarra, segunda capa de teclas) suenan. Introducción y
+   outro van casi desnudos, sin batería.
 3. **Compás a compás.** Antes de cada compás se elige el próximo acorde, el próximo patrón de batería
    y se genera la frase de melodía. Con eso se escriben todas las notas del compás: comping de teclas
-   (acorde largo + stab), bajo en la raíz o la quinta, arpegio sobre el voicing y batería según patrón.
+   (acorde largo + stab), bajo en la raíz o la quinta, arpegio sobre el voicing, batería según patrón y
+   las capas opcionales que habilite la sección.
 4. **Humanización.** A cada nota se le suma un pequeño desvío de *timing* y de velocity. La batería
    queda recta en el tiempo a propósito y solo se le mueve la intensidad.
 5. **Scheduler.** Un reloj con lookahead mira las notas en beats, las convierte a segundos y las mete
